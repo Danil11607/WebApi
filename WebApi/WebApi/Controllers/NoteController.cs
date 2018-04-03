@@ -32,22 +32,64 @@ namespace WebApi.Controllers
             return new ObjectResult(item);
         }
 
-        // POST api/<controller>
+        //POST api/note
         [HttpPost]
-        public void Post([FromBody]string value)
+        public IActionResult Create([FromBody] Note note)
         {
+            if (note == null)
+            {
+                return BadRequest();
+            }
+            db.Notes.Add(note);
+            db.SaveChanges();
+            return CreatedAtRoute("GetTodo", new { id = note.Id }, note);
         }
 
-        // PUT api/<controller>/5
+        //PUT api/note/{id}
         [HttpPut("{id}")]
-        public void Put(int id, [FromBody]string value)
+        public IActionResult Update(int id, [FromBody] Note note)
         {
+            if (note == null || note.Id != id)
+                return BadRequest();            
+
+            var temporaryNote = db.Notes.Find(id);
+            if (temporaryNote == null)            
+                return NotFound();            
+
+            db.Notes.Update(note);
+            db.SaveChanges();
+            return new NoContentResult();
         }
 
-        // DELETE api/<controller>/5
-        [HttpDelete("{id}")]
-        public void Delete(int id)
+        //PATCH api/note/{id}
+        [HttpPatch("{id}")]
+        public IActionResult Update([FromBody] Note note, int id)
         {
+            if (note == null)            
+                return BadRequest();
+
+            var temporaryNote = db.Notes.Find(id);
+            if (temporaryNote == null)            
+                return NotFound();            
+
+            note.Id = temporaryNote.Id;
+
+            db.Notes.Update(note);
+            db.SaveChanges();
+            return new NoContentResult();
+        }
+
+        //DELETE api/note/{id}
+        [HttpDelete("{id}")]
+        public IActionResult Delete(int id)
+        {
+            var note = db.Notes.Find(id);
+            if (note == null)
+                return NotFound();
+
+            db.Notes.Remove(note);
+            db.SaveChanges();
+            return new NoContentResult();
         }
     }
 }
