@@ -11,9 +11,8 @@ using WebApi.Models;
 namespace WebApi.Controllers
 {
     [Route("api/[controller]")]
-    public class NoteController : Controller
+    public class NotesController : Controller
     {
-        //private MyDbContext db = new MyDbContext();
         private List<Note> Notes = new List<Note>
         {
             new Note(1, "First task", true),
@@ -21,13 +20,13 @@ namespace WebApi.Controllers
             new Note(3, "Third task", false)
         };
 
-        //GET api/note
-        public IEnumerable<Note> GetAll(int page)
+        //GET api/notes
+        public IEnumerable<Note> GetAll()
         {
             return Notes;
         }
 
-        //GET api/note/{id}
+        //GET api/notes/{id}
         [HttpGet("{id}", Name = "GetNote")]
         public IActionResult GetById(int id)
         {
@@ -38,18 +37,18 @@ namespace WebApi.Controllers
             return new ObjectResult(item);
         }
 
-        //POST api/note
+        //POST api/notes
         [HttpPost]
-        public IEnumerable<Note> Create([FromBody] Note note)
+        public IActionResult Create([FromBody] Note note)
         {
             if (note == null)
-                return null;
+                return BadRequest();
             Notes.Add(note);
 
-            return Notes;
+            return new NoContentResult();
         }
 
-        //PUT api/note/{id}
+        //PUT api/notes/{id}
         [HttpPut("{id}")]
         public IActionResult Update(int id, [FromBody] Note note)
         {
@@ -65,7 +64,7 @@ namespace WebApi.Controllers
             return new ObjectResult(Notes[id - 1]);
         }
 
-        //PATCH api/note/{id}
+        //PATCH api/notes/{id}
         [HttpPatch("{id}")]
         public IActionResult Update([FromBody] Note note, int id)
         {
@@ -83,17 +82,17 @@ namespace WebApi.Controllers
             return new ObjectResult(Notes[id - 1]);
         }
 
-        //DELETE api/note/{id}
+        //DELETE api/notes/{id}
         [HttpDelete("{id}")]
-        public IEnumerable<Note> Delete(int id)
+        public IActionResult Delete(int id)
         {
             var note = Notes.FirstOrDefault(x => x.Id == id);
             if (note == null)
-                return null;
+                return NotFound();
 
             Notes.Remove(note);
 
-            return Notes;
+            return new NoContentResult();
         }
     }
 }
