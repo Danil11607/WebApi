@@ -13,19 +13,24 @@ namespace WebApi.Controllers
     [Route("api/[controller]")]
     public class NoteController : Controller
     {
-        private MyDbContext db = new MyDbContext();
+        //private MyDbContext db = new MyDbContext();
+        private List<Note> Notes = new List<Note>
+        {
+            new Note(1, "Something", false),
+            new Note(2, "SecondTask", false)
+        };
 
         //GET api/note
-        public IEnumerable<Note> GetAll()
+        public IEnumerable<Note> GetAll(int page)
         {
-            return db.Notes;
+            return Notes;
         }
 
         //GET api/note/{id}
         [HttpGet("{id}", Name = "GetNote")]
         public IActionResult GetById(int id)
         {
-            var item = db.Notes.Find(id);
+            var item = Notes.FirstOrDefault(x => x.Id == id);
             if (item == null)
                 return NotFound();
 
@@ -34,15 +39,13 @@ namespace WebApi.Controllers
 
         //POST api/note
         [HttpPost]
-        public IActionResult Create([FromBody] Note note)
+        public IEnumerable<Note> Create([FromBody] Note note)
         {
             if (note == null)
-            {
-                return BadRequest();
-            }
-            db.Notes.Add(note);
-            db.SaveChanges();
-            return CreatedAtRoute("GetTodo", new { id = note.Id }, note);
+                return null;
+            Notes.Add(note);
+
+            return Notes;
         }
 
         //PUT api/note/{id}
@@ -50,46 +53,46 @@ namespace WebApi.Controllers
         public IActionResult Update(int id, [FromBody] Note note)
         {
             if (note == null || note.Id != id)
-                return BadRequest();            
+                return BadRequest();
 
-            var temporaryNote = db.Notes.Find(id);
-            if (temporaryNote == null)            
-                return NotFound();            
+            var temporaryNote = Notes.FirstOrDefault(x => x.Id == id);
+            if (temporaryNote == null)
+                return NotFound();
 
-            db.Notes.Update(note);
-            db.SaveChanges();
-            return new NoContentResult();
+            Notes[Notes.IndexOf(temporaryNote)] = temporaryNote;
+
+            return new ObjectResult(temporaryNote);
         }
 
         //PATCH api/note/{id}
         [HttpPatch("{id}")]
         public IActionResult Update([FromBody] Note note, int id)
         {
-            if (note == null)            
+            if (note == null)
                 return BadRequest();
 
-            var temporaryNote = db.Notes.Find(id);
-            if (temporaryNote == null)            
-                return NotFound();            
+            var temporaryNote = Notes.FirstOrDefault(x => x.Id == id);
+            if (temporaryNote == null)
+                return NotFound();
 
             note.Id = temporaryNote.Id;
 
-            db.Notes.Update(note);
-            db.SaveChanges();
-            return new NoContentResult();
+            Notes[Notes.IndexOf(temporaryNote)] = temporaryNote;
+
+            return new ObjectResult(temporaryNote);
         }
 
         //DELETE api/note/{id}
         [HttpDelete("{id}")]
         public IActionResult Delete(int id)
         {
-            var note = db.Notes.Find(id);
+            var note = Notes.FirstOrDefault(x => x.Id == id);
             if (note == null)
                 return NotFound();
 
-            db.Notes.Remove(note);
-            db.SaveChanges();
-            return new NoContentResult();
+            Notes.Remove(note);
+
+            return new ObjectResult(note);
         }
     }
 }

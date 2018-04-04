@@ -7,9 +7,11 @@ using Microsoft.AspNetCore.Hosting;
 using Microsoft.EntityFrameworkCore;
 using Microsoft.Extensions.Configuration;
 using Microsoft.Extensions.DependencyInjection;
+using Microsoft.Extensions.DependencyInjection.Extensions;
 using Microsoft.Extensions.Logging;
 using Microsoft.Extensions.Options;
 using WebApi.Data;
+using WebApi.Models;
 
 namespace WebApi
 {
@@ -25,8 +27,13 @@ namespace WebApi
         // This method gets called by the runtime. Use this method to add services to the container.
         public void ConfigureServices(IServiceCollection services)
         {
-            services.AddDbContext<MyDbContext>(options =>
-                options.UseSqlServer(Configuration.GetConnectionString("DefaultConnection")));
+            //services.AddDbContext<MyDbContext>(options => options.UseInMemoryDatabase());
+
+            services.AddSingleton(new List<Note>()
+            {
+                new Note(1, "Something", false),
+                new Note(2, "SecondTask", false)
+            });
 
             services.AddMvc();
         }
@@ -40,6 +47,16 @@ namespace WebApi
             }
 
             app.UseMvc();
+
+            //using (var db = new MyDbContext())
+            //{
+            //    var list = new List<Note>()
+            //    {
+            //        new Note(1, "Something", false),
+            //        new Note(2, "SecondTask", false)
+            //    };
+            //    db.Notes.AddRange(list);
+            //}
         }
     }
 }

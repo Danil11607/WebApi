@@ -32,7 +32,7 @@ namespace WebApi.Migrations
 
                     b.HasKey("Id");
 
-                    b.ToTable("Notes");
+                    b.ToTable("db.Notes");
                 });
 #pragma warning restore 612, 618
         }

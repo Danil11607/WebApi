@@ -10,5 +10,12 @@ namespace WebApi.Models
         public int Id { get; set; }
         public string Text { get; set; }
         public bool IsComplete { get; set; }
+
+        public Note(int id, string text, bool isComplete)
+        {
+            Id = id;
+            Text = text;
+            IsComplete = isComplete;
+        }
     }
 }
