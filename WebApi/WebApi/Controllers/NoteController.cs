@@ -16,8 +16,9 @@ namespace WebApi.Controllers
         //private MyDbContext db = new MyDbContext();
         private List<Note> Notes = new List<Note>
         {
-            new Note(1, "Something", false),
-            new Note(2, "SecondTask", false)
+            new Note(1, "First task", true),
+            new Note(2, "Second task", false),
+            new Note(3, "Third task", false)
         };
 
         //GET api/note
@@ -59,9 +60,9 @@ namespace WebApi.Controllers
             if (temporaryNote == null)
                 return NotFound();
 
-            Notes[Notes.IndexOf(temporaryNote)] = temporaryNote;
+            Notes[id - 1] = note;
 
-            return new ObjectResult(temporaryNote);
+            return new ObjectResult(Notes[id - 1]);
         }
 
         //PATCH api/note/{id}
@@ -77,22 +78,22 @@ namespace WebApi.Controllers
 
             note.Id = temporaryNote.Id;
 
-            Notes[Notes.IndexOf(temporaryNote)] = temporaryNote;
+            Notes[id - 1] = note;
 
-            return new ObjectResult(temporaryNote);
+            return new ObjectResult(Notes[id - 1]);
         }
 
         //DELETE api/note/{id}
         [HttpDelete("{id}")]
-        public IActionResult Delete(int id)
+        public IEnumerable<Note> Delete(int id)
         {
             var note = Notes.FirstOrDefault(x => x.Id == id);
             if (note == null)
-                return NotFound();
+                return null;
 
             Notes.Remove(note);
 
-            return new ObjectResult(note);
+            return Notes;
         }
     }
 }
